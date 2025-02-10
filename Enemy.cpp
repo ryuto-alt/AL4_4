@@ -11,9 +11,7 @@ Enemy::Enemy()
 
 Enemy::~Enemy()
 {
-	for (EnemyBullet* bullet : bullets_) {
-		delete bullet;
-	}
+	
 }
 
 KamataEngine::Vector3 Enemy::GetWorldPosition()
@@ -80,19 +78,19 @@ void Enemy::Update()
 		fireTimer = 60;
 	}
 
-	//弾更新
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Update();
-	}
+	////弾更新
+	//for (EnemyBullet* bullet : bullets_) {
+	//	bullet->EnemyBulletUpdate();
+	//}
 
-	//死んだ弾を削除
-	bullets_.remove_if([](EnemyBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-		});
+	////死んだ弾を削除
+	//gameScene_->enemyBullets_.remove_if([](EnemyBullet* bullet) {
+	//	if (bullet->IsDead()) {
+	//		delete bullet;
+	//		return true;
+	//	}
+	//	return false;
+	//	});
 
 	// フェーズごとの動作
 	switch (phase_) {
@@ -118,40 +116,44 @@ void Enemy::Draw(KamataEngine::Camera* camera)
 	//敵
 	model_->Draw(worldTransform_, *camera, textureHandle_);
 	//弾
-	for (EnemyBullet* bullet : bullets_) {
-		bullet->Draw(*camera);
-	}
+	//for (EnemyBullet* bullet : bullets_) {
+	//	bullet->EnemyBulletDraw(*camera,enemyBullet);
+	//}
 }
 
 void Enemy::Fire()
 {
-	KamataEngine::Vector3 position = worldTransform_.translation_;
-	KamataEngine::Vector3 velocity = { 0, 0, 1 };
-
-	if (fireTimer == 0) {
-		assert(player_);
-		const float kBulletSpeed = 0.2f;
-
-		// 自キャラのワールド座標を取得する
-		KamataEngine::Vector3 playerPosition = player_->GetWorldPosition();
-		// 敵キャラのワールド座標を取得する
-		KamataEngine::Vector3 enemyPosition = worldTransform_.translation_;
-		// 敵キャラから自キャラへの差分ベクトルを求める
-		KamataEngine::Vector3 direction = playerPosition - enemyPosition;
-
-		// ベクトルの正規化
-		direction = Normalize(direction);
-
-		// ベクトルの長さを速さに合わせる
-		velocity = direction * kBulletSpeed;
-
-		// 弾の生成と初期化
-		EnemyBullet* newBullet = new EnemyBullet();
-		newBullet->Initialize(model_, worldTransform_.translation_, velocity);
-
-		// 弾を登録する
-		bullets_.push_back(newBullet);
+	if (fireTimer > 0) {
+		return; // まだクールダウン中なら発射しない
 	}
+
+	assert(player_);
+	const float kBulletSpeed = 0.2f;
+
+	// 自キャラのワールド座標を取得する
+	KamataEngine::Vector3 playerPosition = player_->GetWorldPosition();
+	// 敵キャラのワールド座標を取得する
+	KamataEngine::Vector3 enemyPosition = worldTransform_.translation_;
+	// 敵キャラから自キャラへの差分ベクトルを求める
+	KamataEngine::Vector3 direction = playerPosition - enemyPosition;
+
+	// ベクトルの正規化
+	direction = Normalize(direction);
+
+	// ベクトルの長さを速さに合わせる
+	KamataEngine::Vector3 velocity = direction * kBulletSpeed;
+
+	// 弾の生成と初期化
+	EnemyBullet* newBullet = new EnemyBullet();
+	newBullet->Initialize(model_, worldTransform_.translation_, velocity);
+
+	// `GameScene` に弾を登録する
+	if (gameScene_) {
+		gameScene_->AddEnemyBullet(newBullet);
+	}
+
+	// 発射後、タイマーをリセット
+	fireTimer = 60;
 }
 
 void Enemy::OnCollision()

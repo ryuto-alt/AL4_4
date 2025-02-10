@@ -26,20 +26,17 @@ void EnemyBullet::Initialize(KamataEngine::Model* model,
 
 	velocity_ = velocity;
 }
-
-void EnemyBullet::Update()
+void EnemyBullet::EnemyBulletUpdate()
 {
 	worldTransform_.UpdateMatrix();
 
 	worldTransform_.translation_ += velocity_;
 }
-
-void EnemyBullet::Draw(KamataEngine::Camera& camera)
+void EnemyBullet::EnemyBulletDraw(KamataEngine::Camera& camera)
 {
 	model_->Draw(worldTransform_, camera,
 		textureHandle_);
 }
-
 void EnemyBullet::OnCollision()
 {
 	isDead_ = true;

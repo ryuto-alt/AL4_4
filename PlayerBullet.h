@@ -22,6 +22,7 @@ public:
 	void Update();
 	void Draw(KamataEngine::Camera& viewProjection);
 
+
 	bool IsDead()const { return isDead_; }
 
 	float GetCollisionRadius() const {

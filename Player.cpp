@@ -13,7 +13,7 @@ Player::Player()
 
 Player::~Player()
 {
-	for (PlayerBullet* bullet : bullets_) {
+	for (PlayerBullet* bullet : gameScene_->playerBullets_) {
 	  delete bullet;
 	}
 }
@@ -82,30 +82,12 @@ void Player::Update() {
 
 	//攻撃呼び出し
 	Attack();
-
-	//弾更新
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Update();
-	}
-
-	//死んだ弾を削除
-	bullets_.remove_if([](PlayerBullet* bullet) {
-		if (bullet->IsDead()) {
-			delete bullet;
-			return true;
-		}
-		return false;
-	});
 }
 
 void Player::Draw(KamataEngine::Camera* camera) {
 
 	model_->Draw(worldTransform_, *camera, textureHandle_);
 
-	//弾描画
-	for (PlayerBullet* bullet : bullets_) {
-		bullet->Draw(*camera);
-	}
 }
 
 void Player::Attack() {
@@ -125,7 +107,8 @@ void Player::Attack() {
 		newBullet->Initialize(model_, position, velocity);
 
 		// 弾を登録する
-		bullets_.push_back(newBullet);
+		GetGameScene()->AddPlayerBullet(newBullet);
+		//bullets_.push_back(newBullet);
 	}
 }
 

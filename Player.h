@@ -2,6 +2,7 @@
 #include "3d/Model.h"
 #include "3d/WorldTransform.h"
 #include "3d/camera.h"
+#include "GameScene.h"
 #include <input/Input.h>
 #include <algorithm> 
 #include "PlayerBullet.h"
@@ -9,6 +10,7 @@
 #include <DirectXMath.h>
 
 class PlayerBullet;
+class GameScene;
 
 class Player {
 
@@ -22,7 +24,7 @@ public:
 	//ワールド座標を返す
 	KamataEngine::Vector3 GetWorldPosition();
 	//弾リストを取得
-	const std::list<PlayerBullet*>& GetBullets() const { return bullets_; }
+//	const std::list<PlayerBullet*>& GetBullets() const { return gameScene_->playerBullets_; }
 
 	void Initialize(KamataEngine::Model* model, uint32_t textureHandle, KamataEngine::Vector3 position);
 	void Update();
@@ -42,6 +44,9 @@ public:
 	//軸となるワールドトランスフォームをセット
 	void SetParent(const KamataEngine::WorldTransform* parent);
 
+	GameScene* GetGameScene() const { return gameScene_; }
+	void SetGameScene(GameScene* gameScene) { gameScene_ = gameScene; }
+
 private:
 
 	//ワールド変換データ
@@ -59,8 +64,7 @@ private:
 	//キー入力
 	KamataEngine::Input* input_ = nullptr;
 
-	//弾リスト
-	std::list<PlayerBullet*> bullets_;
+	GameScene* gameScene_ = nullptr;
 
 	//スケールのベクトル
 	KamataEngine::Vector3 scale_;
